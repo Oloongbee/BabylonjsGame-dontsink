@@ -267,7 +267,26 @@ export class Ship{
             value: 4
         });
         xSlide.setKeys(keyFrames);
-        this.scene.beginDirectAnimation(this.ship.mesh, [xSlide], 0, 30, false,1);
+        this.scene.beginDirectAnimation(this.ship.mesh, [xSlide], 0, 30, false,1,()=>{
+            //给船上下浮动的动画
+            this.frameRate=10
+            const xSlide = new BABYLON.Animation("xSlide", "position.y", this.frameRate, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
+            const keyFrames = []; 
+            keyFrames.push({
+                frame: 0,
+                value: 4
+            });
+            keyFrames.push({
+                frame: this.frameRate,
+                value: 4.7
+            });
+            keyFrames.push({
+                frame: 2 * this.frameRate,
+                value: 4
+            });
+            xSlide.setKeys(keyFrames);
+            this.scene.beginDirectAnimation(this.ship.mesh, [xSlide], 0, 2 * this.frameRate, true);
+        });
 
     }
 

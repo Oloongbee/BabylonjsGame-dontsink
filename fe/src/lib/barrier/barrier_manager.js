@@ -146,7 +146,7 @@ export class BarrierManager{
         this.gapStart = Math.random() * (this.maxSpawnX - this.minSpawnX - this.barrierWidth - this.gapSize) + this.minSpawnX;
         let rotation_angular=this.getRandomInt(1,10);
         let barrier_choice=barrierArray[this.getRandomInt(0,1)];
-        let barrier=modelLoaded[barrier_choice].clone(new BABYLON.Vector3(this.gapStart,4.5,-80),new BABYLON.Vector3(0,Math.PI/rotation_angular,0),null);
+        let barrier=modelLoaded[barrier_choice].clone(new BABYLON.Vector3(this.gapStart,4.5,-100),new BABYLON.Vector3(0,Math.PI/rotation_angular,0),null);
         modelClone[barrier_choice].push(barrier);
         barrier.physicsAggregate.body.setAngularDamping(10000);
         barrier.mesh.visibility=1;
@@ -157,7 +157,7 @@ export class BarrierManager{
     generator(){
         this.scene?.registerBeforeRender(()=>{
             if(this.isSpawn){
-                let speedIncrease=0.001;
+                let speedIncrease=0.0015;
                 this.speed+=speedIncrease;
                 this.water.windForce=-this.speed*3;
                 if(this.spawnTime==null){
@@ -216,7 +216,7 @@ export class BarrierManager{
         modelClone["wood"]=[];
 
         this.speed=20;
-        this.water.windForce=-this.speed*3;
+        this.water.windForce=-30;
     }
 
     //处理模型的销毁问题

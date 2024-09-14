@@ -185,6 +185,7 @@ class GameScene{
         this.startButton.left = "0%"; 
         this.startButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
         this.startButton.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+        this.startButton.zIndex=100;
         this.maskRect.addControl(this.startButton);
         this.startButton.onPointerUpObservable.add(() => {
             this.gameStart();
@@ -228,6 +229,7 @@ class GameScene{
         this.restartButton.left = "0%"; 
         this.restartButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
         this.restartButton.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+        this.restartButton.zIndex=100;
         this.maskRect_gameover.addControl(this.restartButton);
         this.restartButton.onPointerUpObservable.add(() => {
             this.gameStart();
