@@ -13,7 +13,7 @@
    ```bash
    git clone https://github.com/yourusername/dont_sink.git
    ```
-2. 克隆项目仓库：
+2. 切换项目文件夹：
 
    ```bash
    cd fe

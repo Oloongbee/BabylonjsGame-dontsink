@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { BarrierManager } from "$lib/barrier/barrier_manager";
 import { Ship } from "$lib/ship/ship";
 import * as BABYLON from "@babylonjs/core";
