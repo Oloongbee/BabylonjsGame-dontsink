@@ -11,7 +11,7 @@
 1. 克隆项目仓库：
 
    ```bash
-   git clone https://github.com/Oloongbee/dont_sink.git
+   git clone https://github.com/Oloongbee/BabylonjsGame-dontsink.git
    ```
 2. 切换项目文件夹：
 
