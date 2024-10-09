@@ -67,8 +67,10 @@ export class Ship{
         this.ship=modelLoaded["ship"].mesh.visibility=0;
         this.ship=modelLoaded["ship"].clone(new BABYLON.Vector3(0,4,50),null,null);
         this.ship.mesh.visibility=1;
+        this.shiplight = new BABYLON.SpotLight("spotLight", this.lightPos, new BABYLON.Vector3(0, 0, -1), Math.PI / 2, 10, this.scene);
+        this.shiplight.diffuse = new BABYLON.Color3(0.91, 0.89, 0.81);
+        this.shiplight.specular = new BABYLON.Color3(0.96, 0.96, 0.96);
     
-
         //给船上下浮动的动画
         this.frameRate=10
         const xSlide = new BABYLON.Animation("xSlide", "position.y", this.frameRate, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE);
@@ -215,7 +217,12 @@ export class Ship{
             }
         }
 
-        this.scene?.registerBeforeRender(keyboardListener)
+        let lightPosChange=async()=>{
+            this.shiplight.position=new BABYLON.Vector3(this.ship.mesh.position.x,this.ship.mesh.position.y+0.5,this.ship.mesh.position.z);
+        }
+
+        this.scene.registerBeforeRender(keyboardListener);
+        this.scene.registerBeforeRender(lightPosChange);
     }
 
     //重新设定船的方向

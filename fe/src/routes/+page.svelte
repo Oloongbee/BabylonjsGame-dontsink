@@ -30,7 +30,7 @@
 		text-align: center;
 		font-size: 16px;
 		color: white;
-		top: 15px;
+		top: 900px;
 		right: 10px;
 		width: 60px;
 		height: 20px;

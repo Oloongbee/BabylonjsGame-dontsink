@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 import { BarrierManager } from "$lib/barrier/barrier_manager";
 import { Ship } from "$lib/ship/ship";
 import * as BABYLON from "@babylonjs/core";
@@ -87,6 +87,8 @@ class GameScene{
         //模型是右手坐标系,场景必须也使用右手坐标系
         this.scene.useRightHandedSystem = true;
 
+        this.daytime=true;
+
         if(this.hkPhysicsPlugin){
             let enablePhysicsOK = this.scene.enablePhysics(new BABYLON.Vector3(0, 0, 0), this.hkPhysicsPlugin);
             if(!enablePhysicsOK){
@@ -96,25 +98,41 @@ class GameScene{
 
         this.camera = new BABYLON.ArcRotateCamera("camera", Math.PI/2, Math.PI/5, 1, new BABYLON.Vector3(0, 60, 80), this.scene);
         this.camera.rotation=new BABYLON.Vector3(Math.PI/8,0,Math.PI)
-        // this.camera.attachControl(renderCanvas, true);
+        this.camera.attachControl(renderCanvas, true);
 
         this.light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0, 1, 0), this.scene);
-        this.light.intensity = 1
+        this.light.intensity = 1;
+
+        this.ground_sand = BABYLON.MeshBuilder.CreateGround("ground",{width:200,height:200},this.scene);
+        this.ground_sand.position.y=-10;
+        let groundMaterial = new BABYLON.StandardMaterial("groundMaterial", this.scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture("/ground_sand.jpg", this.scene);
+        groundMaterial.diffuseTexture.uScale = groundMaterial.diffuseTexture.vScale = 4;
+        this.ground_sand.material=groundMaterial;
+        
 
         // 天空盒
-        var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:5000.0}, this.scene);
-        var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
-        skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("/skybox/", this.scene);
-        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-        skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-        skyboxMaterial.disableLighting = true;
-        skybox.material = skyboxMaterial;
-        
-        this.ground = BABYLON.MeshBuilder.CreateBox("ground", { size:200,height:3}, this.scene);
-        this.ground.position.y = -10;
-        this.ground.rotation=new BABYLON.Vector3(0,Math.PI/2,0);
+        this.skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:5000.0}, this.scene);
+        this.skyboxMaterial = new BABYLON.StandardMaterial("skyBox", this.scene);
+        this.skyboxMaterial.backFaceCulling = false;
+        this.skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("/skybox/", this.scene);
+        this.skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        this.skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        this.skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+        this.skyboxMaterial.disableLighting = true;
+        this.skybox.material = this.skyboxMaterial;
+
+        this.skyboxMaterial_dark = new BABYLON.StandardMaterial("skyBox", this.scene);
+        this.skyboxMaterial_dark.backFaceCulling = false;
+        this.skyboxMaterial_dark.reflectionTexture = new BABYLON.CubeTexture("/dark_skybox/", this.scene);
+        this.skyboxMaterial_dark.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+        this.skyboxMaterial_dark.diffuseColor = new BABYLON.Color3(0, 0, 0);
+        this.skyboxMaterial_dark.specularColor = new BABYLON.Color3(0, 0, 0);
+        this.skyboxMaterial_dark.disableLighting = true;
+
+        this.ground = BABYLON.MeshBuilder.CreateGround("ground", { width:200,height:200}, this.scene);
+        this.ground.position.y = -8;
+        // this.ground.rotation=new BABYLON.Vector3(0,Math.PI/2,0);
         let ground_aggregate = new BABYLON.PhysicsAggregate(
             this.ground,
             BABYLON.PhysicsShapeType.BOX,
@@ -131,7 +149,8 @@ class GameScene{
         this.water.windDirection = new BABYLON.Vector2(0, 1);
         this.water.waterColor = new BABYLON.Color3(0, 0, 221 / 255);
         this.water.colorBlendFactor = 0.0;
-        this.water.addToRenderList(skybox);
+        this.water.addToRenderList(this.skybox);
+        // this.water.addToRenderList(this.ground_sand);
         this. ground.material = this.water;
     }
 
@@ -245,6 +264,31 @@ class GameScene{
         this.restartButton.addControl(buttonText_gameover);
         this.maskRect_gameover.isVisible=false;
 
+        this.sunButtonImage = new GUI.Image("sunButtonBackground", "/sun.png");
+        this.sunButtonImage.width = "100%";
+        this.sunButtonImage.height = "100%";
+
+        this.moonButtonImage = new GUI.Image("moonButtonBackground", "/moon.png");
+        this.moonButtonImage.width = "100%";
+        this.moonButtonImage.height = "100%";
+
+
+        this.timeButton = GUI.Button.CreateSimpleButton("timeButton", "");
+        this.timeButton.width = "3%";
+        this.timeButton.height = "5%";
+        this.timeButton.color = "rgba(0, 0, 0, 1)";
+        // this.timeButton.background = "rgba(0, 0, 0, 1)";
+        this.timeButton.left = "47%"; 
+        this.timeButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+        this.timeButton.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+        this.timeButton.zIndex=100;
+        this.timeButton.addControl(this.moonButtonImage);
+        this.timeButton.color = "transparent";
+        this.guiTexture.addControl(this.timeButton);
+        this.timeButton.onPointerUpObservable.add(() => {
+            this.changeLight();
+        });
+
         //创建玩家船
         this.ship=new Ship(this.scene,this.gameOver);
         await this.ship.loadShip();
@@ -258,6 +302,28 @@ class GameScene{
         window.addEventListener('focus', ()=>this.resume());
         this.updateHighestScore();
 
+    }
+
+    changeLight(){
+        
+        if(this.daytime==true){
+            this.daytime=false;
+            this.light.intensity=0.01;
+            this.ship.shiplight.intensity=3;
+            this.skybox.material=this.skyboxMaterial_dark;
+            this.timeButton?.removeControl(this.moonButtonImage);
+            this.timeButton?.addControl(this.sunButtonImage);
+            this.water.addToRenderList(this.ground_sand);
+            
+        }else if(this.daytime==false){
+            this.daytime=true;
+            this.light.intensity=1;
+            this.ship.shiplight.intensity=0;
+            this.skybox.material=this.skyboxMaterial;
+            this.timeButton?.removeControl(this.sunButtonImage);
+            this.timeButton?.addControl(this.moonButtonImage);
+            this.water.removeFromRenderList(this.ground_sand);
+        }
     }
 
     gameStart(){
